@@ -14,13 +14,11 @@ using System;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace Apos.WintabDN
-{
+namespace Apos.WintabDN {
     /// <summary>
     /// Globals used for Wintab extensions.
     /// </summary>
-    public class WTExtensionsGlobal
-    {
+    public class WTExtensionsGlobal {
         /// <summary>
         /// Maximum size of data buffer used in WTExtensionProperty.
         /// </summary>
@@ -31,8 +29,7 @@ namespace Apos.WintabDN
     /// <summary>
     /// Tag values used to get extension masks in GetWTExtensionMask
     /// </summary>
-    public enum EWTXExtensionTag
-    {
+    public enum EWTXExtensionTag {
         // enums 0 - 5 are deprecated
         /// <summary>
         /// Touch Strip extension mask tag
@@ -54,8 +51,7 @@ namespace Apos.WintabDN
     /// Index values used for WTI extensions.
     /// For more information, see Wintab 1.4.
     /// </summary>
-    public enum EWTIExtensionIndex
-    {
+    public enum EWTIExtensionIndex {
         /// <summary>
         /// Get a unique, null-terminated string describing the extension.
         /// </summary>
@@ -115,8 +111,7 @@ namespace Apos.WintabDN
     /// <summary>
     /// Tablet property values used with WTExtGet and WTExtSet
     /// </summary>
-    public enum EWTExtensionTabletProperty
-    {
+    public enum EWTExtensionTabletProperty {
         /// <summary>
         /// number of physical controls on tablet
         /// </summary>
@@ -181,15 +176,13 @@ namespace Apos.WintabDN
     /// <summary>
     /// Tablet Icon values used with WTExtGet and WTExtSet
     /// </summary>
-    public enum EWTExtensionIconProperty
-    {
+    public enum EWTExtensionIconProperty {
         TABLET_ICON_FMT_NONE = 0,          // No display
         TABLET_ICON_FMT_4BPP_GRAY = 1      // 4bpp grayscale
     }
 
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
-    public struct WTExtensionPropertyBase
-    {
+    public struct WTExtensionPropertyBase {
         /// <summary>
         /// Structure version (reserved: always 0 for now)
         /// </summary>
@@ -213,25 +206,24 @@ namespace Apos.WintabDN
         /// <summary>
         /// ID of property being set (see EWTExtensionTabletProperty)
         /// </summary>
-        public UInt16 propertyID;
+        public ushort propertyID;
 
         /// <summary>
         /// Alignment padding (reserved)
         /// </summary>
-        public UInt16 reserved;
+        public ushort reserved;
 
         /// <summary>
         /// Number of bytes in data[] buffer
         /// </summary>
-        public UInt32 dataSize;
+        public uint dataSize;
     }
 
     /// <summary>
     /// Structure for reading/writing non-image Wintab extension data. (Wintab 1.4)
     /// </summary>
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
-    public struct WTExtensionProperty
-    {
+    public struct WTExtensionProperty {
         public WTExtensionPropertyBase extBase;
 
         /// <summary>
@@ -246,8 +238,7 @@ namespace Apos.WintabDN
     /// Structure read/writing image Wintab extension data. (Wintab 1.4)
     /// </summary>
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
-    public struct WTExtensionImageProperty
-    {
+    public struct WTExtensionImageProperty {
         public WTExtensionPropertyBase extBase;
 
         /// <summary>
@@ -270,34 +261,29 @@ namespace Apos.WintabDN
     /// Similarly, an application can define actions for Touch Ring and Touch Strip button
     /// modes, and respond to user swipes on those controls to provide customized behavior.
     /// </summary>
-    public class CWintabExtensions
-    {
+    public class CWintabExtensions {
         /// <summary>
         /// Return the extension mask for the given tag.
         /// </summary>
         /// <param name="tag_I">type of extension being searched for</param>
         /// <returns>0xFFFFFFFF on error</returns>
-        public static UInt32 GetWTExtensionMask(EWTXExtensionTag tag_I)
-        {
-            UInt32 extMask = 0;
+        public static uint GetWTExtensionMask(EWTXExtensionTag tag_I) {
+            uint extMask = 0;
             IntPtr buf = CMemUtils.AllocUnmanagedBuf(extMask);
 
-            try
-            {
-                UInt32 extIndex = FindWTExtensionIndex(tag_I);
+            try {
+                uint extIndex = FindWTExtensionIndex(tag_I);
 
                 // Supported if extIndex != -1
-                if (extIndex != 0xFFFFFFFF)
-                {
+                if (extIndex != 0xFFFFFFFF) {
                     int size = (int)CWintabFuncs.WTInfoA(
-                        (uint)EWTICategoryIndex.WTI_EXTENSIONS + (uint)extIndex,
+                        (uint)EWTICategoryIndex.WTI_EXTENSIONS + extIndex,
                         (uint)EWTIExtensionIndex.EXT_MASK, buf);
 
-                    extMask = (UInt32)CMemUtils.MarshalUnmanagedBuf<UInt32>(buf, size);
+                    extMask = CMemUtils.MarshalUnmanagedBuf<uint>(buf, size);
                 }
             }
-            catch (Exception ex)
-            {
+            catch (Exception ex) {
                 throw new Exception($"FAILED GetWTExtensionMask: {ex}");
             }
 
@@ -311,25 +297,21 @@ namespace Apos.WintabDN
         /// </summary>
         /// <param name="tag_I">type of extension being searched for</param>
         /// <returns>0xFFFFFFFF on error</returns>
-        public static UInt32 FindWTExtensionIndex(EWTXExtensionTag tag_I)
-        {
-            UInt32 thisTag = 0;
-            UInt32 extIndex = 0xFFFFFFFF;
+        public static uint FindWTExtensionIndex(EWTXExtensionTag tag_I) {
+            uint thisTag = 0;
+            uint extIndex = 0xFFFFFFFF;
             IntPtr buf = CMemUtils.AllocUnmanagedBuf(thisTag);
 
-            for (Int32 loopIdx = 0, size = -1; size != 0; loopIdx++)
-            {
+            for (int loopIdx = 0, size = -1; size != 0; loopIdx++) {
                 size = (int)CWintabFuncs.WTInfoA(
-                    (uint)EWTICategoryIndex.WTI_EXTENSIONS + (UInt32)loopIdx,
+                    (uint)EWTICategoryIndex.WTI_EXTENSIONS + (uint)loopIdx,
                     (uint)EWTIExtensionIndex.EXT_TAG, buf);
 
-                if (size > 0)
-                {
-                    thisTag = CMemUtils.MarshalUnmanagedBuf<UInt32>(buf, size);
+                if (size > 0) {
+                    thisTag = CMemUtils.MarshalUnmanagedBuf<uint>(buf, size);
 
-                    if ((EWTXExtensionTag)thisTag == tag_I)
-                    {
-                        extIndex = (UInt32)loopIdx;
+                    if ((EWTXExtensionTag)thisTag == tag_I) {
+                        extIndex = (uint)loopIdx;
                         break;
                     }
                 }
@@ -358,9 +340,8 @@ namespace Apos.WintabDN
             byte controlIndex_I,
             byte functionIndex_I,
             ushort propertyID_I,
-            ref UInt32 result_O
-            )
-        {
+            ref uint result_O
+            ) {
             bool retStatus = false;
             WTExtensionProperty extProperty = new WTExtensionProperty();
             IntPtr buf = CMemUtils.AllocUnmanagedBuf(extProperty);
@@ -371,23 +352,20 @@ namespace Apos.WintabDN
             extProperty.extBase.functionIndex = functionIndex_I;
             extProperty.extBase.propertyID = propertyID_I;
             extProperty.extBase.reserved = 0;
-            extProperty.extBase.dataSize = (uint)System.Runtime.InteropServices.Marshal.SizeOf(result_O);
+            extProperty.extBase.dataSize = (uint)Marshal.SizeOf(result_O);
 
             Marshal.StructureToPtr(extProperty, buf, false);
 
-            try
-            {
-                bool status = CWintabFuncs.WTExtGet((UInt32)context_I, (UInt32)extTagIndex_I, buf);
+            try {
+                bool status = CWintabFuncs.WTExtGet((uint)context_I, extTagIndex_I, buf);
 
-                if (status)
-                {
+                if (status) {
                     WTExtensionProperty retProp = (WTExtensionProperty)Marshal.PtrToStructure(buf, typeof(WTExtensionProperty));
                     result_O = retProp.data[0];
                     retStatus = true;
                 }
             }
-            catch (Exception ex)
-            {
+            catch (Exception ex) {
                 throw new Exception($"FAILED ControlPropertyGet: {ex}");
             }
 
@@ -414,15 +392,13 @@ namespace Apos.WintabDN
             byte controlIndex_I,
             byte functionIndex_I,
             ushort propertyID_I,
-            UInt32 value_I
-        )
-        {
-            bool retStatus = false;
+            uint value_I
+        ) {
+            bool retStatus;
             WTExtensionProperty extProperty = new WTExtensionProperty();
             IntPtr buf = CMemUtils.AllocUnmanagedBuf(extProperty);
 
-            try
-            {
+            try {
                 byte[] valueBytes = BitConverter.GetBytes(value_I);
 
                 extProperty.extBase.version = 0;
@@ -431,18 +407,17 @@ namespace Apos.WintabDN
                 extProperty.extBase.functionIndex = functionIndex_I;
                 extProperty.extBase.propertyID = propertyID_I;
                 extProperty.extBase.reserved = 0;
-                extProperty.extBase.dataSize = (uint)System.Runtime.InteropServices.Marshal.SizeOf(value_I);
+                extProperty.extBase.dataSize = (uint)Marshal.SizeOf(value_I);
                 extProperty.data = new byte[WTExtensionsGlobal.WTExtensionPropertyMaxDataBytes];
 
                 // Send input value as an array of bytes.
-                System.Buffer.BlockCopy(valueBytes, 0, extProperty.data, 0, (int)extProperty.extBase.dataSize);
+                Buffer.BlockCopy(valueBytes, 0, extProperty.data, 0, (int)extProperty.extBase.dataSize);
 
                 Marshal.StructureToPtr(extProperty, buf, false);
 
-                retStatus = CWintabFuncs.WTExtSet((UInt32)context_I, (UInt32)extTagIndex_I, buf);
+                retStatus = CWintabFuncs.WTExtSet((uint)context_I, (uint)extTagIndex_I, buf);
             }
-            catch (Exception ex)
-            {
+            catch (Exception ex) {
                 throw new Exception($"{ex}");
             }
 
@@ -469,17 +444,15 @@ namespace Apos.WintabDN
             byte controlIndex_I,
             byte functionIndex_I,
             ushort propertyID_I,
-            String value_I
-            )
-        {
-            bool retStatus = false;
+            string value_I
+            ) {
+            bool retStatus;
             WTExtensionProperty extProperty = new WTExtensionProperty();
             IntPtr buf = CMemUtils.AllocUnmanagedBuf(extProperty);
 
-            try
-            {
+            try {
                 // Convert unicode string value_I to UTF8-encoded bytes
-                byte[] utf8Bytes = System.Text.Encoding.Convert(Encoding.Unicode, Encoding.UTF8, Encoding.Unicode.GetBytes(value_I));
+                byte[] utf8Bytes = Encoding.Convert(Encoding.Unicode, Encoding.UTF8, Encoding.Unicode.GetBytes(value_I));
 
                 extProperty.extBase.version = 0;
                 extProperty.extBase.tabletIndex = tabletIndex_I;
@@ -491,14 +464,13 @@ namespace Apos.WintabDN
                 extProperty.data = new byte[WTExtensionsGlobal.WTExtensionPropertyMaxDataBytes];
 
                 // Send input value as an array of UTF8-encoded bytes.
-                System.Buffer.BlockCopy(utf8Bytes, 0, extProperty.data, 0, (int)extProperty.extBase.dataSize);
+                Buffer.BlockCopy(utf8Bytes, 0, extProperty.data, 0, (int)extProperty.extBase.dataSize);
 
                 Marshal.StructureToPtr(extProperty, buf, false);
 
-                retStatus = CWintabFuncs.WTExtSet((UInt32)context_I, (UInt32)extTagIndex_I, buf);
+                retStatus = CWintabFuncs.WTExtSet((uint)context_I, (uint)extTagIndex_I, buf);
             }
-            catch (Exception ex)
-            {
+            catch (Exception ex) {
                 throw new Exception($"{ex}");
             }
 

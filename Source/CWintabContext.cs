@@ -13,28 +13,26 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace Apos.WintabDN
-{
+namespace Apos.WintabDN {
     /// <summary>
     /// Managed version of AXIS struct.
     /// </summary>
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
-    public struct WintabAxis
-    {
+    public struct WintabAxis {
         /// <summary>
         /// Specifies the minimum value of the data item in the tablet's native coordinates.
         /// </summary>
-        public Int32 axMin;
+        public int axMin;
 
         /// <summary>
         /// Specifies the maximum value of the data item in the tablet's native coordinates.
         /// </summary>
-        public Int32 axMax;
+        public int axMax;
 
         /// <summary>
         /// Indicates the units used in calculating the resolution for the data item.
         /// </summary>
-        public UInt32 axUnits;
+        public uint axUnits;
 
         /// <summary>
         /// Is a fixed-point number giving the number of data item increments per physical unit.
@@ -46,8 +44,7 @@ namespace Apos.WintabDN
     /// Array of WintabAxis objects.
     /// </summary>
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
-    public struct WintabAxisArray
-    {
+    public struct WintabAxisArray {
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)]
         public WintabAxis[] array;
     }
@@ -55,8 +52,7 @@ namespace Apos.WintabDN
     /// <summary>
     /// Values to use when asking for X, Y or Z WintabAxis object.
     /// </summary>
-    public enum EAxisDimension
-    {
+    public enum EAxisDimension {
         AXIS_X = EWTIDevicesIndex.DVC_X,
         AXIS_Y = EWTIDevicesIndex.DVC_Y,
         AXIS_Z = EWTIDevicesIndex.DVC_Z
@@ -65,8 +61,7 @@ namespace Apos.WintabDN
     /// <summary>
     /// Context option values.
     /// </summary>
-    public enum ECTXOptionValues
-    {
+    public enum ECTXOptionValues {
         CXO_SYSTEM = 0x0001,
         CXO_PEN = 0x0002,
         CXO_MESSAGES = 0x0004,
@@ -78,8 +73,7 @@ namespace Apos.WintabDN
     /// <summary>
     /// Context status values.
     /// </summary>
-    public enum ECTXStatusValues
-    {
+    public enum ECTXStatusValues {
         CXS_DISABLED = 0x0001,
         CXS_OBSCURED = 0x0002,
         CXS_ONTOP = 0x0004
@@ -88,8 +82,7 @@ namespace Apos.WintabDN
     /// <summary>
     /// Context lock values.
     /// </summary>
-    public enum ECTXLockValues
-    {
+    public enum ECTXLockValues {
         CXL_INSIZE = 0x0001,
         CXL_INASPECT = 0x0002,
         CXL_SENSITIVITY = 0x0004,
@@ -103,41 +96,40 @@ namespace Apos.WintabDN
     /// application or to Windows itself.
     /// </summary>
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
-    public struct WintabLogContext
-    {
+    public struct WintabLogContext {
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 40)]    //LCNAMELEN
         public string lcName;
-        public UInt32 lcOptions;
-        public UInt32 lcStatus;
-        public UInt32 lcLocks;
-        public UInt32 lcMsgBase;
-        public UInt32 lcDevice;
-        public UInt32 lcPktRate;
+        public uint lcOptions;
+        public uint lcStatus;
+        public uint lcLocks;
+        public uint lcMsgBase;
+        public uint lcDevice;
+        public uint lcPktRate;
         public WTPKT lcPktData;
         public WTPKT lcPktMode;
         public WTPKT lcMoveMask;
-        public UInt32 lcBtnDnMask;
-        public UInt32 lcBtnUpMask;
-        public Int32 lcInOrgX;
-        public Int32 lcInOrgY;
-        public Int32 lcInOrgZ;
-        public Int32 lcInExtX;
-        public Int32 lcInExtY;
-        public Int32 lcInExtZ;
-        public Int32 lcOutOrgX;
-        public Int32 lcOutOrgY;
-        public Int32 lcOutOrgZ;
-        public Int32 lcOutExtX;
-        public Int32 lcOutExtY;
-        public Int32 lcOutExtZ;
+        public uint lcBtnDnMask;
+        public uint lcBtnUpMask;
+        public int lcInOrgX;
+        public int lcInOrgY;
+        public int lcInOrgZ;
+        public int lcInExtX;
+        public int lcInExtY;
+        public int lcInExtZ;
+        public int lcOutOrgX;
+        public int lcOutOrgY;
+        public int lcOutOrgZ;
+        public int lcOutExtX;
+        public int lcOutExtY;
+        public int lcOutExtZ;
         public FIX32 lcSensX;
         public FIX32 lcSensY;
         public FIX32 lcSensZ;
         public bool lcSysMode;
-        public Int32 lcSysOrgX;
-        public Int32 lcSysOrgY;
-        public Int32 lcSysExtX;
-        public Int32 lcSysExtY;
+        public int lcSysOrgX;
+        public int lcSysOrgY;
+        public int lcSysExtX;
+        public int lcSysExtY;
         public FIX32 lcSysSensX;
         public FIX32 lcSysSensY;
     }
@@ -145,8 +137,7 @@ namespace Apos.WintabDN
     /// <summary>
     /// Class to support access to Wintab context management.
     /// </summary>
-    public class CWintabContext
-    {
+    public class CWintabContext {
         // Context data.
         private WintabLogContext m_logContext = new WintabLogContext();
         private HCTX m_hCTX = 0;
@@ -154,23 +145,23 @@ namespace Apos.WintabDN
         /// <summary>
         /// Default constructor sets all data bits to be captured.
         /// </summary>
-        public CWintabContext()
-        {
+        public CWintabContext() {
             // Init with all bits set (The Full Monty) to get all non-extended data types.
-            PktData = (uint)
-                (EWintabPacketBit.PK_CONTEXT |
-                    EWintabPacketBit.PK_STATUS |
-                    EWintabPacketBit.PK_TIME |
-                    EWintabPacketBit.PK_CHANGED |
-                    EWintabPacketBit.PK_SERIAL_NUMBER |
-                    EWintabPacketBit.PK_CURSOR |
-                    EWintabPacketBit.PK_BUTTONS |
-                    EWintabPacketBit.PK_X |
-                    EWintabPacketBit.PK_Y |
-                    EWintabPacketBit.PK_Z |
-                    EWintabPacketBit.PK_NORMAL_PRESSURE |
-                    EWintabPacketBit.PK_TANGENT_PRESSURE |
-                    EWintabPacketBit.PK_ORIENTATION);
+            PktData = (uint) (
+                EWintabPacketBit.PK_CONTEXT |
+                EWintabPacketBit.PK_STATUS |
+                EWintabPacketBit.PK_TIME |
+                EWintabPacketBit.PK_CHANGED |
+                EWintabPacketBit.PK_SERIAL_NUMBER |
+                EWintabPacketBit.PK_CURSOR |
+                EWintabPacketBit.PK_BUTTONS |
+                EWintabPacketBit.PK_X |
+                EWintabPacketBit.PK_Y |
+                EWintabPacketBit.PK_Z |
+                EWintabPacketBit.PK_NORMAL_PRESSURE |
+                EWintabPacketBit.PK_TANGENT_PRESSURE |
+                EWintabPacketBit.PK_ORIENTATION
+            );
             MoveMask = PktData;
         }
 
@@ -180,14 +171,10 @@ namespace Apos.WintabDN
         /// <param name="hwnd_I">parent window for the context</param>
         /// <param name="enable_I">true to enable, false to disable</param>
         /// <returns>Returns non-zero context handle if successful.</returns>
-        public HCTX Open(HWND hwnd_I, bool enable_I)
-        {
-            try
-            {
+        public HCTX Open(HWND hwnd_I, bool enable_I) {
+            try {
                 m_hCTX = CWintabFuncs.WTOpenA(hwnd_I, ref m_logContext, enable_I);
-            }
-            catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 throw new Exception($"FAILED OpenContext: {ex}");
             }
 
@@ -198,23 +185,18 @@ namespace Apos.WintabDN
         /// Close the context for this object.
         /// </summary>
         /// <returns>true if context successfully closed</returns>
-        public bool Close()
-        {
-            bool status = false;
+        public bool Close() {
+            bool status;
 
-            try
-            {
-                if (m_hCTX == 0)
-                {
+            try {
+                if (m_hCTX == 0) {
                     throw new Exception("CloseContext: invalid context");
                 }
 
                 status = CWintabFuncs.WTClose(m_hCTX);
                 m_hCTX = 0;
                 m_logContext = new WintabLogContext();
-            }
-            catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 throw new Exception($"FAILED CloseContext: {ex}");
             }
 
@@ -226,21 +208,16 @@ namespace Apos.WintabDN
         /// </summary>
         /// <param name="enable_I">true = enable</param>
         /// <returns>Returns true if completed successfully</returns>
-        public bool Enable(bool enable_I)
-        {
-            bool status = false;
+        public bool Enable(bool enable_I) {
+            bool status;
 
-            try
-            {
-                if (m_hCTX == 0)
-                {
+            try {
+                if (m_hCTX == 0) {
                     throw new Exception("EnableContext: invalid context");
                 }
 
                 status = CWintabFuncs.WTEnable(m_hCTX, enable_I);
-            }
-            catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 throw new Exception($"FAILED EnableContext: {ex}");
             }
 
@@ -251,22 +228,17 @@ namespace Apos.WintabDN
         /// Sends a tablet context to the top or bottom of the order of overlapping tablet contexts
         /// </summary>
         /// <param name="toTop_I">true = send tablet to top of order</param>
-        /// <returns>Returns true if successsful</returns>
-        public bool SetOverlapOrder(bool toTop_I)
-        {
-            bool status = false;
+        /// <returns>Returns true if successful</returns>
+        public bool SetOverlapOrder(bool toTop_I) {
+            bool status;
 
-            try
-            {
-                if (m_hCTX == 0)
-                {
+            try {
+                if (m_hCTX == 0) {
                     throw new Exception("EnableContext: invalid context");
                 }
 
                 status = CWintabFuncs.WTOverlap(m_hCTX, toTop_I);
-            }
-            catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 throw new Exception($"FAILED SetContextOverlapOrder: {ex}");
             }
 
@@ -294,7 +266,7 @@ namespace Apos.WintabDN
         /// field can be any combination of the values defined in
         /// ECTXOptionValues.
         /// </summary>
-        public UInt32 Options { get { return m_logContext.lcOptions; } set { m_logContext.lcOptions = value; } }
+        public uint Options { get { return m_logContext.lcOptions; } set { m_logContext.lcOptions = value; } }
 
         /// <summary>
         /// Specifies current status conditions for the context.
@@ -302,7 +274,7 @@ namespace Apos.WintabDN
         /// operator. The lcStatus field can be any combination of
         /// the values defined in ECTXStatusValues.
         /// </summary>
-        public UInt32 Status { get { return m_logContext.lcStatus; } set { m_logContext.lcStatus = value; } }
+        public uint Status { get { return m_logContext.lcStatus; } set { m_logContext.lcStatus = value; } }
 
         /// <summary>
         /// Specifies which attributes of the context the application
@@ -315,24 +287,24 @@ namespace Apos.WintabDN
         /// ECTXLockValues. Locks can only be changed by the task
         /// or process that owns the context.
         /// </summary>
-        public UInt32 Locks { get { return m_logContext.lcLocks; } set { m_logContext.lcLocks = value; } }
+        public uint Locks { get { return m_logContext.lcLocks; } set { m_logContext.lcLocks = value; } }
 
         /// <summary>
         /// Specifies the range of message numbers that will be used for
         /// reporting the activity of the context.
         /// </summary>
-        public UInt32 MsgBase { get { return m_logContext.lcMsgBase; } set { m_logContext.lcMsgBase = value; } }
+        public uint MsgBase { get { return m_logContext.lcMsgBase; } set { m_logContext.lcMsgBase = value; } }
 
         /// <summary>
         /// Specifies the device whose input the context processes.
         /// </summary>
-        public UInt32 Device { get { return m_logContext.lcDevice; } set { m_logContext.lcDevice = value; } }
+        public uint Device { get { return m_logContext.lcDevice; } set { m_logContext.lcDevice = value; } }
 
         /// <summary>
         /// Specifies the desired packet report rate in Hertz. Once the con-text is opened, this field will
         /// contain the actual report rate.
         /// </summary>
-        public UInt32 PktRate { get { return m_logContext.lcPktRate; } set { m_logContext.lcPktRate = value; } }
+        public uint PktRate { get { return m_logContext.lcPktRate; } set { m_logContext.lcPktRate = value; } }
 
         /// <summary>
         /// Specifies which optional data items will be in packets returned from the context. Requesting
@@ -361,7 +333,7 @@ namespace Apos.WintabDN
         /// overlapping contexts, button press events for buttons that are not selected in this field may be
         /// processed by underlying contexts.
         /// </summary>
-        public UInt32 BtnDnMask { get { return m_logContext.lcBtnDnMask; } set { m_logContext.lcBtnDnMask = value; } }
+        public uint BtnDnMask { get { return m_logContext.lcBtnDnMask; } set { m_logContext.lcBtnDnMask = value; } }
 
         /// <summary>
         /// Specifies the buttons for which button release events will be processed in the context. In the case
@@ -372,79 +344,79 @@ namespace Apos.WintabDN
         /// context and processed as if they had occurred in the context. When the button is released, the context
         /// will receive the button release event, and then event processing will return to normal.
         /// </summary>
-        public UInt32 BtnUpMask { get { return m_logContext.lcBtnUpMask; } set { m_logContext.lcBtnUpMask = value; } }
+        public uint BtnUpMask { get { return m_logContext.lcBtnUpMask; } set { m_logContext.lcBtnUpMask = value; } }
 
         /// <summary>
         /// Specifies the X origin of the context's input area in the tablet's native coordinates. Value is clipped
         /// to the tablet native coordinate space when the context is opened or modified.
         /// </summary>
-        public Int32 InOrgX { get { return m_logContext.lcInOrgX; } set { m_logContext.lcInOrgX = value; } }
+        public int InOrgX { get { return m_logContext.lcInOrgX; } set { m_logContext.lcInOrgX = value; } }
 
         /// <summary>
         /// Specifies the Y origin of the context's input area in the tablet's native coordinates. Value is clipped
         /// to the tablet native coordinate space when the context is opened or modified.
         /// </summary>
-        public Int32 InOrgY { get { return m_logContext.lcInOrgY; } set { m_logContext.lcInOrgY = value; } }
+        public int InOrgY { get { return m_logContext.lcInOrgY; } set { m_logContext.lcInOrgY = value; } }
 
         /// <summary>
         /// Specifies the Z origin of the context's input area in the tablet's native coordinates. Value is clipped
         /// to the tablet native coordinate space when the context is opened or modified.
         /// </summary>
-        public Int32 InOrgZ { get { return m_logContext.lcInOrgZ; } set { m_logContext.lcInOrgZ = value; } }
+        public int InOrgZ { get { return m_logContext.lcInOrgZ; } set { m_logContext.lcInOrgZ = value; } }
 
         /// <summary>
         /// Specifies the X extent of the context's input area in the tablet's native coordinates. Value is clipped
         /// to the tablet native coordinate space when the context is opened or modified.
         /// </summary>
-        public Int32 InExtX { get { return m_logContext.lcInExtX; } set { m_logContext.lcInExtX = value; } }
+        public int InExtX { get { return m_logContext.lcInExtX; } set { m_logContext.lcInExtX = value; } }
 
         /// <summary>
         /// Specifies the Y extent of the context's input area in the tablet's native coordinates. Value is clipped
         /// to the tablet native coordinate space when the context is opened or modified.
         /// </summary>
-        public Int32 InExtY { get { return m_logContext.lcInExtY; } set { m_logContext.lcInExtY = value; } }
+        public int InExtY { get { return m_logContext.lcInExtY; } set { m_logContext.lcInExtY = value; } }
 
         /// <summary>
         /// Specifies the Z extent of the context's input area in the tablet's native coordinates. Value is clipped
         /// to the tablet native coordinate space when the context is opened or modified.
         /// </summary>
-        public Int32 InExtZ { get { return m_logContext.lcInExtZ; } set { m_logContext.lcInExtZ = value; } }
+        public int InExtZ { get { return m_logContext.lcInExtZ; } set { m_logContext.lcInExtZ = value; } }
 
         /// <summary>
         /// Specifies the X origin of the context's output area in context output coordinates.  Value is used in
         /// coordinate scaling for absolute mode only.
         /// </summary>
-        public Int32 OutOrgX { get { return m_logContext.lcOutOrgX; } set { m_logContext.lcOutOrgX = value; } }
+        public int OutOrgX { get { return m_logContext.lcOutOrgX; } set { m_logContext.lcOutOrgX = value; } }
 
         /// <summary>
         /// Specifies the Y origin of the context's output area in context output coordinates.  Value is used in
         /// coordinate scaling for absolute mode only.
         /// </summary>
-        public Int32 OutOrgY { get { return m_logContext.lcOutOrgY; } set { m_logContext.lcOutOrgY = value; } }
+        public int OutOrgY { get { return m_logContext.lcOutOrgY; } set { m_logContext.lcOutOrgY = value; } }
 
         /// <summary>
         /// Specifies the Z origin of the context's output area in context output coordinates.  Value is used in
         /// coordinate scaling for absolute mode only.
         /// </summary>
-        public Int32 OutOrgZ { get { return m_logContext.lcOutOrgZ; } set { m_logContext.lcOutOrgZ = value; } }
+        public int OutOrgZ { get { return m_logContext.lcOutOrgZ; } set { m_logContext.lcOutOrgZ = value; } }
 
         /// <summary>
         /// Specifies the X extent of the context's output area in context output coordinates.  Value is used
         /// in coordinate scaling for absolute mode only.
         /// </summary>
-        public Int32 OutExtX { get { return m_logContext.lcOutExtX; } set { m_logContext.lcOutExtX = value; } }
+        public int OutExtX { get { return m_logContext.lcOutExtX; } set { m_logContext.lcOutExtX = value; } }
 
         /// <summary>
         /// Specifies the Y extent of the context's output area in context output coordinates.  Value is used
         /// in coordinate scaling for absolute mode only.
         /// </summary>
-        public Int32 OutExtY { get { return m_logContext.lcOutExtY; } set { m_logContext.lcOutExtY = value; } }
+        public int OutExtY { get { return m_logContext.lcOutExtY; } set { m_logContext.lcOutExtY = value; } }
 
         /// <summary>
         /// Specifies the Z extent of the context's output area in context output coordinates.  Value is used
         /// in coordinate scaling for absolute mode only.
         /// </summary>
-        public Int32 OutExtZ { get { return m_logContext.lcOutExtZ; } set { m_logContext.lcOutExtZ = value; } }
+        public int OutExtZ { get { return m_logContext.lcOutExtZ; } set { m_logContext.lcOutExtZ = value; } }
 
         /// <summary>
         /// Specifies the relative-mode sensitivity factor for the x axis.
@@ -469,22 +441,22 @@ namespace Apos.WintabDN
         /// <summary>
         /// Specifies the X origin of the screen mapping area for system cursor tracking, in screen coordinates.
         /// </summary>
-        public Int32 SysOrgX { get { return m_logContext.lcSysOrgX; } set { m_logContext.lcSysOrgX = value; } }
+        public int SysOrgX { get { return m_logContext.lcSysOrgX; } set { m_logContext.lcSysOrgX = value; } }
 
         /// <summary>
         /// Specifies the Y origin of the screen mapping area for system cursor tracking, in screen coordinates.
         /// </summary>
-        public Int32 SysOrgY { get { return m_logContext.lcSysOrgY; } set { m_logContext.lcSysOrgY = value; } }
+        public int SysOrgY { get { return m_logContext.lcSysOrgY; } set { m_logContext.lcSysOrgY = value; } }
 
         /// <summary>
         /// Specifies the X extent of the screen mapping area for system cursor tracking, in screen coordinates.
         /// </summary>
-        public Int32 SysExtX { get { return m_logContext.lcSysExtX; } set { m_logContext.lcSysExtX = value; } }
+        public int SysExtX { get { return m_logContext.lcSysExtX; } set { m_logContext.lcSysExtX = value; } }
 
         /// <summary>
         /// Specifies the Y extent of the screen mapping area for system cursor tracking, in screen coordinates.
         /// </summary>
-        public Int32 SysExtY { get { return m_logContext.lcSysExtY; } set { m_logContext.lcSysExtY = value; } }
+        public int SysExtY { get { return m_logContext.lcSysExtY; } set { m_logContext.lcSysExtY = value; } }
 
         /// <summary>
         /// Specifies the system-cursor relative-mode sensitivity factor for the x axis.

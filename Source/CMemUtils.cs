@@ -14,31 +14,25 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace Apos.WintabDN
-{
+namespace Apos.WintabDN {
     /// <summary>
     /// Provide utility methods for unmanaged memory management.
     /// </summary>
-    public class CMemUtils
-    {
+    public class CMemUtils {
         /// <summary>
         /// Allocates a pointer to unmanaged heap memory of sizeof(val_I).
         /// </summary>
         /// <param name="val_I">managed object that determines #bytes of unmanaged buf</param>
         /// <returns>Unmanaged buffer pointer.</returns>
-        public static IntPtr AllocUnmanagedBuf(Object val_I)
-        {
-            IntPtr buf = IntPtr.Zero;
+        public static IntPtr AllocUnmanagedBuf(object val_I) {
+            IntPtr buf;
 
-            try
-            {
+            try {
                 int numBytes = Marshal.SizeOf(val_I);
 
                 // First allocate a buffer of the correct size.
                 buf = Marshal.AllocHGlobal(numBytes);
-            }
-            catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 throw new Exception($"FAILED AllocUnmanagedBuf: {ex}");
             }
 
@@ -50,16 +44,12 @@ namespace Apos.WintabDN
         /// </summary>
         /// <param name="size_I">number of bytes to allocate</param>
         /// <returns>Unmanaged buffer pointer.</returns>
-        public static IntPtr AllocUnmanagedBuf(int size_I)
-        {
-            IntPtr buf = IntPtr.Zero;
+        public static IntPtr AllocUnmanagedBuf(int size_I) {
+            IntPtr buf;
 
-            try
-            {
+            try {
                 buf = Marshal.AllocHGlobal(size_I);
-            }
-            catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 throw new Exception($"FAILED AllocUnmanagedBuf: {ex}");
             }
 
@@ -73,18 +63,15 @@ namespace Apos.WintabDN
         /// <param name="buf_I">unmanaged heap pointer</param>
         /// <param name="size">expected size of buf_I</param>
         /// <returns>Managed object of specified type.</returns>
-        public static T MarshalUnmanagedBuf<T>(IntPtr buf_I, int size)
-        {
-            if (buf_I == IntPtr.Zero)
-            {
+        public static T MarshalUnmanagedBuf<T>(IntPtr buf_I, int size) {
+            if (buf_I == IntPtr.Zero) {
                 throw new Exception("MarshalUnmanagedBuf has NULL buf_I");
             }
 
             // If size doesn't match type size, then return a zeroed struct.
-            if (size != Marshal.SizeOf(typeof(T)))
-            {
+            if (size != Marshal.SizeOf(typeof(T))) {
                 int typeSize = Marshal.SizeOf(typeof(T));
-                Byte[] byteArray = new Byte[typeSize];
+                byte[] byteArray = new byte[typeSize];
                 Marshal.Copy(byteArray, 0, buf_I, typeSize);
             }
 
@@ -95,12 +82,9 @@ namespace Apos.WintabDN
         /// Free unmanaged memory pointed to by buf_I.
         /// </summary>
         /// <param name="buf_I">pointer to unmanaged heap memory</param>
-        public static void FreeUnmanagedBuf(IntPtr buf_I)
-        {
-            if (buf_I != IntPtr.Zero)
-            {
+        public static void FreeUnmanagedBuf(IntPtr buf_I) {
+            if (buf_I != IntPtr.Zero) {
                 Marshal.FreeHGlobal(buf_I);
-                buf_I = IntPtr.Zero;
             }
         }
 
@@ -110,31 +94,25 @@ namespace Apos.WintabDN
         /// <param name="buf_I">pointer to unmanaged heap memory</param>
         /// <param name="size_I">size of ASCII string, includes null termination</param>
         /// <returns></returns>
-        public static string MarshalUnmanagedString(IntPtr buf_I, int size_I)
-        {
-            string retStr = null;
+        public static string MarshalUnmanagedString(IntPtr buf_I, int size_I) {
+            string retStr;
 
-            if (buf_I == IntPtr.Zero)
-            {
+            if (buf_I == IntPtr.Zero) {
                 throw new Exception("MarshalUnmanagedString has null buffer.");
             }
 
-            if (size_I <= 0)
-            {
+            if (size_I <= 0) {
                 throw new Exception("MarshalUnmanagedString has zero size.");
             }
 
-            try
-            {
-                Byte[] byteArray = new Byte[size_I];
+            try {
+                byte[] byteArray = new byte[size_I];
 
                 Marshal.Copy(buf_I, byteArray, 0, size_I);
 
                 System.Text.Encoding encoding = System.Text.Encoding.UTF8;
                 retStr = encoding.GetString(byteArray);
-            }
-            catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 throw new Exception($"FAILED MarshalUnmanagedString: {ex}");
             }
 
@@ -147,17 +125,8 @@ namespace Apos.WintabDN
         /// <param name="numPkts_I">number of packets to marshal</param>
         /// <param name="buf_I">pointer to unmanaged heap memory containing data packets</param>
         /// <returns></returns>
-
-        /// <summary>
-        /// Marshal unmanaged data packets into managed WintabPacket data.
-        /// </summary>
-        /// <param name="numPkts_I">number of packets to marshal</param>
-        /// <param name="buf_I">pointer to unmanaged heap memory containing data packets</param>
-        /// <returns></returns>
-        public static WintabPacket[] MarshalDataPackets(UInt32 numPkts_I, IntPtr buf_I)
-        {
-            if (numPkts_I == 0 || buf_I == IntPtr.Zero)
-            {
+        public static WintabPacket[] MarshalDataPackets(uint numPkts_I, IntPtr buf_I) {
+            if (numPkts_I == 0 || buf_I == IntPtr.Zero) {
                 return null;
             }
 
@@ -165,8 +134,7 @@ namespace Apos.WintabDN
 
             int pktSize = Marshal.SizeOf(new WintabPacket());
 
-            for (int pktsIdx = 0; pktsIdx < numPkts_I; pktsIdx++)
-            {
+            for (int pktsIdx = 0; pktsIdx < numPkts_I; pktsIdx++) {
                 // Tracing can be added here to capture raw packet data if desired
 
                 packets[pktsIdx] = (WintabPacket)Marshal.PtrToStructure(IntPtr.Add(buf_I, pktsIdx * pktSize), typeof(WintabPacket));
@@ -181,12 +149,10 @@ namespace Apos.WintabDN
         /// <param name="numPkts_I">number of packets to marshal</param>
         /// <param name="buf_I">pointer to unmanaged heap memory containing data packets</param>
         /// <returns></returns>
-        public static WintabPacketExt[] MarshalDataExtPackets(UInt32 numPkts_I, IntPtr buf_I)
-        {
+        public static WintabPacketExt[] MarshalDataExtPackets(uint numPkts_I, IntPtr buf_I) {
             WintabPacketExt[] packets = new WintabPacketExt[numPkts_I];
 
-            if (numPkts_I == 0 || buf_I == IntPtr.Zero)
-            {
+            if (numPkts_I == 0 || buf_I == IntPtr.Zero) {
                 return null;
             }
 
@@ -194,22 +160,20 @@ namespace Apos.WintabDN
             // This is "necessary" because none of the other ways I tried to marshal
             // seemed to work.  It's ugly, but it works.
             int pktSize = Marshal.SizeOf(new WintabPacketExt());
-            Byte[] byteArray = new Byte[numPkts_I * pktSize];
+            byte[] byteArray = new byte[numPkts_I * pktSize];
             Marshal.Copy(buf_I, byteArray, 0, (int)numPkts_I * pktSize);
 
-            Byte[] byteArray2 = new Byte[pktSize];
+            byte[] byteArray2 = new byte[pktSize];
 
-            for (int pktsIdx = 0; pktsIdx < numPkts_I; pktsIdx++)
-            {
-                for (int idx = 0; idx < pktSize; idx++)
-                {
+            for (int pktsIdx = 0; pktsIdx < numPkts_I; pktsIdx++) {
+                for (int idx = 0; idx < pktSize; idx++) {
                     byteArray2[idx] = byteArray[(pktsIdx * pktSize) + idx];
                 }
 
-                IntPtr tmp = CMemUtils.AllocUnmanagedBuf(pktSize);
+                IntPtr tmp = AllocUnmanagedBuf(pktSize);
                 Marshal.Copy(byteArray2, 0, tmp, pktSize);
 
-                packets[pktsIdx] = CMemUtils.MarshalUnmanagedBuf<WintabPacketExt>(tmp, pktSize);
+                packets[pktsIdx] = MarshalUnmanagedBuf<WintabPacketExt>(tmp, pktSize);
             }
 
             return packets;
